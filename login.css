@@ -1,0 +1,92 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    background-color: #f4f7b8;
+}
+nav {
+    display: flex;
+    justify-content: space-around;
+    font-family: "Poppins", sans-serif;
+    margin-top: 20px;
+    align-items: center;
+    color: #F9FF80;
+    background-color:#3642FE;
+    padding: 25px;
+    margin: 0;
+}
+.subtitle {
+    font-weight: 300;
+    font-size: 18px;
+    font-family: "Praise", cursive;
+    color: white;
+}
+.title {
+    font-weight: 800;
+    font-size: 20px;
+}
+.camposLogin {
+    color: #F9FF80;
+    background-color: #3642FE;
+    margin-top: 50px;
+    font-family: "Poppins", sans-serif;
+    padding: 30px;
+    font-size: 150%;
+    justify-content: center;
+    display: grid;
+    border-radius: 10px;
+    width: 500px;
+}
+#nomeid {
+    border-radius: 5px;
+    font-size: 35px;
+    border: none;
+    background-color: #f4f7b8;
+}
+#senhaid {
+    border-radius: 5px;
+    font-size: 35px;
+    border: none;
+    background-color: #f4f7b8;
+}
+.logar {
+    border-radius: 5px;
+    font-size: 35px;
+    color:#3642FE;
+    background-color: #F9FF80;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    border: none;
+}
+h1{
+    text-align: center;
+    font-size: 148%;
+}
+.logar:hover {
+    background-color: #f6d853;
+    transition: 1s ;
+}
+.formbox {
+    justify-content: center;
+    display: flex;
+    align-items: center;
+}
+.img {
+    text-align: center;
+    border-radius: 40px;
+    width: 30%;
+}
+.imgUsuario {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+.linkCad>p>a{
+    font-size: 15px;
+    text-align: center;
+    color: #F9FF80;
+    text-decoration: none;
+}
