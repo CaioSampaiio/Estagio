@@ -14,7 +14,7 @@ document.getElementById('camposLogin').addEventListener('submit', function(event
     // Validação das credenciais
     if (nome === credenciaisCorretas.nome && senha === credenciaisCorretas.senha) {
         // Redirecionar para outra página (opcional)
-        window.location.href = "pgPrincipal.html"; // Exemplo de redirecionamento
+        window.location.href = "pgUsuario.html"; // Exemplo de redirecionamento
     } else {
         alert('Nome ou senha incorretos. Tente novamente.');
     }
