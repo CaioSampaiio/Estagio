@@ -142,3 +142,23 @@ footer {
         margin-bottom: 20px;
     }
 }
+@media (max-width: 768px) {
+    nav {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    nav .links ul {
+        flex-direction: column;
+        margin: 20px 0;
+    }
+
+    nav .links ul li {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    nav .btn {
+        margin-top: 20px;
+    }
+}

@@ -90,3 +90,47 @@ h1{
     color: #F9FF80;
     text-decoration: none;
 }
+@media (max-width: 768px) {
+    .formbox {
+        max-width: 90%;
+        padding: 30px 20px;
+    }
+
+    .formbox h1 {
+        font-size: 22px;
+    }
+
+    .camposLogin input {
+        font-size: 14px;
+    }
+
+    .camposLogin button {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .formbox {
+        padding: 20px 15px;
+    }
+
+    .formbox h1 {
+        font-size: 20px;
+    }
+
+    .imgUsuario img {
+        width: 60px;
+    }
+
+    .camposLogin input {
+        font-size: 12px;
+    }
+
+    .camposLogin button {
+        font-size: 14px;
+    }
+
+    .linkCad p {
+        font-size: 12px;
+    }
+}
