@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,21 +21,21 @@
         </div>
     </nav>
     <div class="formbox">
-        <Form class="camposLogin" id="camposLogin">
+        <Form action="/login"  method="POST" class="camposLogin">
             <div class="imgUsuario">
                 <img class="img" src="usuario.png" alt="">
             </div>
             <h1>Login</h1>
-                <label for="Nome">Nome</label>
-                <input type="text" required="required" name="nome" id="nomeid"/>
+                <label for="E-mail">E-mail</label>
+                <input type="email" required="required" name="email" id="emailid">
                 <label for="Senha">Senha</label>
-                <input type="password" required="required" name="senha"id="senhaid"><br>
-                <button class="logar">Logar</button>
+                <input type="password" required="required" name="senha" id="senhaid"><br>
+                <button type="submit" class="logar" id="submit">Logar</button>
                 <div class="linkCad">
                     <p>Ainda não possui uma conta?<a href="pgCadastro.html"> Crie aqui.</a></p>
                 </div>
         </Form>
     </div>
-    <script src="pgLogin.js"></script>
+    <script src="/pgLogin.js"></script>
 </body>
 </html>

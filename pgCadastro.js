@@ -5,14 +5,15 @@ document.getElementById('camposCadastro').addEventListener('submit', function(ev
     const nome = document.getElementById('nomeid').value;
     const email = document.getElementById('emailid').value;
     const senha = document.getElementById('senhaid').value;
-    const celular = document.getElementById('celularid').value;
+    const celular = document.getElementById('telid').value;
 
+   {/*
     // Validação básica
     if (nome === "caio" || email === "caio@gmail.com" || senha === "1234" || celular === "17992331036") {
         alert('Por favor, preencha todos os campos.');
         return;
     }
-
+    */}
     // Validação de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {

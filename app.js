@@ -1,17 +1,42 @@
 const express = require('express');
 const mysql = require('mysql');
+const path = require('path');
 const app = express();
+const { engine } = require('express-handlebars');
+const session = require('express-session');
+
+// Body-parser integrado no express para interpretar JSON e dados de formulários
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Servir arquivos estáticos (HTML, CSS, JS)
+app.use(express.static(path.join(__dirname, '/')));
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pgLogin.html')); // Certifique-se de que este arquivo exista
+});
+
+app.get('/usuario', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pgUsuario.html')); // Certifique-se de que este arquivo exista
+});
+
+app.use(session({
+  secret: 'caio',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // Use true se estiver usando HTTPS
+}));
 
 // Configuração do banco de dados
-const db = mysql.createConnection({
-  host: 'localhost', // ou o endereço do seu servidor MySQL
+const conexão = mysql.createConnection({
+  host: 'localhost',
   user: 'root',
   password: '',
   database: 'popularmoveis'
 });
 
+
 // Conectar ao banco de dados
-db.connect(err => {
+conexão.connect(err => {
   if (err) {
     console.error('Erro ao conectar ao banco de dados:', err);
     return;
@@ -19,18 +44,76 @@ db.connect(err => {
   console.log('Conectado ao banco de dados MySQL.');
 });
 
-// Rota simples para testar a conexão
-app.get('/dados', (req, res) => {
-  const sql = 'SELECT * FROM usuario';
-  db.query(sql, (err, results) => {
-    if (err) {
-      res.status(500).json({ error: err });
+// Servir o arquivo HTML quando o usuário acessar a página inicial
+app.get('/', (req, res) => {
+  if (req.session && req.session.usuario) {
+    // Se o usuário estiver logado, renderize a página com o nome do usuário
+    res.sendFile(path.join(__dirname, 'pgPrincipalLogado.html'));
+  } else {
+    // Caso contrário, mostre a página com as opções de login e cadastro
+    res.sendFile(path.join(__dirname, 'pgPrincipal.html'));
+  }
+});
+
+// Rota para verificar se o usuário está logado
+app.get('/status', (req, res) => {
+  if (req.session.usuario) {
+    res.json({ loggedIn: true, nome: req.session.usuario.nome });
+  } else {
+    res.json({ loggedIn: false });
+  }
+});
+
+// Rota para cadastrar usuário
+app.post('/cadastrar', function(req, res) {
+  const { nome, email, celular, senha } = req.body;
+
+  if (!nome || !email || !celular || !senha) {
+    return res.status(400).json({ error: 'Preencha todos os campos.' });
+  }
+
+  const sql = 'INSERT INTO usuario (nome, email, celular, senha) VALUES (?, ?, ?, ?)';
+  
+  conexão.query(sql, [nome, email, celular, senha], (erro, resultado) => {
+    if (erro) {
+      console.error('Erro ao inserir dados:', erro);
+      return res.status(500).json({ error: 'Erro ao cadastrar usuário.' });
+    }
+    console.log('Usuário cadastrado com sucesso:', resultado);
+    res.redirect('/login');
+  });
+});
+
+// Rota de login
+app.post('/login', (req, res) => {
+  const { email, senha } = req.body;
+
+  const sql = 'SELECT * FROM usuario WHERE email = ? AND senha = ?';
+  conexão.query(sql, [email, senha], (erro, resultados) => {
+    if (erro) {
+      console.error('Erro ao fazer login:', erro);
+      return res.status(500).json({ error: 'Erro ao fazer login.' });
+    }
+
+    if (resultados.length > 0) {
+      req.session.usuario = resultados[0]; // Salva os dados do usuário na sessão
+      res.redirect('/');
     } else {
-      res.json(results);
+      res.status(401).json({ error: 'Email ou senha incorretos.' });
     }
   });
 });
 
+// Rota de logout
+app.get('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/');
+  });
+});
+
+
+// Inicializa o servidor
 app.listen(3000, () => {
   console.log('Servidor rodando na porta 3000');
 });
+
