@@ -12,18 +12,18 @@ app.use(express.urlencoded({ extended: true }));
 // Servir arquivos estáticos (HTML, CSS, JS)
 app.use(express.static(path.join(__dirname, '/')));
 app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pgLogin.html')); // Certifique-se de que este arquivo exista
+  res.sendFile(path.join(__dirname, 'pgLogin.html')); 
 });
 
 app.get('/usuario', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pgUsuario.html')); // Certifique-se de que este arquivo exista
+  res.sendFile(path.join(__dirname, 'pgUsuario.html')); 
 });
 
 app.use(session({
   secret: 'caio',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false } // Use true se estiver usando HTTPS
+  cookie: { secure: false } // Caso eu use HTTPS, usar true  
 }));
 
 // Configuração do banco de dados
