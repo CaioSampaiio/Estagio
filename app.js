@@ -4,6 +4,9 @@ const path = require('path');
 const app = express();
 const { engine } = require('express-handlebars');
 const session = require('express-session');
+const jwt = require('jsonwebtoken');
+const segredoJWT = 'seuSegredoJWT'; // Deve ser uma string secreta segura
+
 
 // Body-parser integrado no express para interpretar JSON e dados de formulários
 app.use(express.json());
@@ -54,6 +57,35 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'pgPrincipal.html'));
   }
 });
+function verificarToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Extrai o token do cabeçalho
+
+  if (!token) {
+      return res.status(403).json({ error: 'Acesso negado. Token não fornecido.' });
+  }
+
+  jwt.verify(token, segredoJWT, (err, usuario) => {
+      if (err) {
+          return res.status(403).json({ error: 'Token inválido ou expirado.' });
+      }
+
+      req.usuario = usuario; // Armazena as informações do usuário no req para usar nas rotas
+      next(); // Continua para a próxima rota
+  });
+}
+
+const isAdmin = (req, res, next) => {
+  if (req.user.role !== 'admin') { // Verifica se o usuário é admin
+    return res.status(403).send('Acesso negado. Somente administradores.');
+  }
+  next();
+};
+
+app.get('/admin', verificarToken, (req, res) => {
+  res.send('Bem-vindo à área de administrador');
+});
+
 
 // Rota para verificar se o usuário está logado
 app.get('/status', (req, res) => {
@@ -96,8 +128,16 @@ app.post('/login', (req, res) => {
     }
 
     if (resultados.length > 0) {
-      req.session.usuario = resultados[0]; // Salva os dados do usuário na sessão
-      res.redirect('/');
+      const usuario = resultados[0];
+
+      // Gera um token JWT com os dados do usuário
+      const token = jwt.sign(
+        { id: usuario.id, email: usuario.email, role: usuario.role }, // role seria a coluna que indica o tipo de usuário
+        segredoJWT,
+        { expiresIn: '1h' } // O token expira em 1 hora
+      );
+
+      res.json({ token }); // Retorna o token ao frontend
     } else {
       res.status(401).json({ error: 'Email ou senha incorretos.' });
     }
