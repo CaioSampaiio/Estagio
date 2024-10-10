@@ -126,7 +126,6 @@ app.post('/login', (req, res) => {
       console.error('Erro ao fazer login:', erro);
       return res.status(500).json({ error: 'Erro ao fazer login.' });
     }
-
     if (resultados.length > 0) {
       const usuario = resultados[0];
 

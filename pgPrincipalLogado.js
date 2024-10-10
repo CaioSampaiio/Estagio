@@ -8,3 +8,30 @@ fetch('/status')
                 }
             })
             .catch(error => console.error('Erro ao verificar o status do login:', error));
+
+            // Ao tentar acessar a rota /admin
+    async function verificarAcessoAdmin() {
+    const token = localStorage.getItem('token');
+
+    if (token) {
+        const response = await fetch('/admin', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (response.status === 403) {
+            alert('Acesso negado. Você não tem permissão para acessar essa página.');
+        } else {
+            const data = await response.text();
+            console.log(data);
+        }
+    } else {
+        alert('Token não encontrado. Faça login novamente.');
+    }
+    }
+
+
+    // Chame esta função para verificar o acesso ao /admin
+    verificarAcessoAdmin();

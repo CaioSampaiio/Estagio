@@ -13,7 +13,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             },
             body: JSON.stringify({ email, senha })
         });
-
+        console.log(response)
         const data = await response.json();
         console.log(data)
 
@@ -22,7 +22,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             localStorage.setItem('token', data.token);
         
             // Redireciona para a página de admin
-            window.location.href = '/admin';
+            window.location.href = 'pgPrincipalLogado.html';
         } else {
             alert(data.error || 'Erro no login');
         }
@@ -33,29 +33,4 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     }
 });
 
-// Ao tentar acessar a rota /admin
-async function verificarAcessoAdmin() {
-    const token = localStorage.getItem('token');
 
-    if (token) {
-        const response = await fetch('/admin', {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (response.status === 403) {
-            alert('Acesso negado. Você não tem permissão para acessar essa página.');
-        } else {
-            const data = await response.text();
-            console.log(data);
-        }
-    } else {
-        alert('Token não encontrado. Faça login novamente.');
-    }
-}
-
-
-// Chame esta função para verificar o acesso ao /admin
-verificarAcessoAdmin();
