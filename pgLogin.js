@@ -35,31 +35,27 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 
 // Ao tentar acessar a rota /admin
 async function verificarAcessoAdmin() {
-    // Verifica se o token está no localStorage
     const token = localStorage.getItem('token');
 
     if (token) {
-        // Faz a requisição para a rota /admin com o token no cabeçalho
-        fetch('/admin', {
+        const response = await fetch('/admin', {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${token}` // Adiciona o token no cabeçalho
+                'Authorization': `Bearer ${token}`
             }
-        })
-        .then(response => {
-            if (response.ok) {
-                return response.text(); // Se a resposta estiver OK, exibe a resposta
-            } else if (response.status === 403) {
-                alert('Acesso negado. Token não reconhecido ou inválido.');
-            }
-        })
-        .then(data => console.log(data))
-        .catch(error => console.error('Erro:', error));
+        });
+
+        if (response.status === 403) {
+            alert('Acesso negado. Você não tem permissão para acessar essa página.');
+        } else {
+            const data = await response.text();
+            console.log(data);
+        }
     } else {
         alert('Token não encontrado. Faça login novamente.');
-        
     }
 }
+
 
 // Chame esta função para verificar o acesso ao /admin
 verificarAcessoAdmin();

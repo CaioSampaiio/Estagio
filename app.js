@@ -76,7 +76,7 @@ function verificarToken(req, res, next) {
 }
 
 const isAdmin = (req, res, next) => {
-  if (req.user.role !== 'admin') { // Verifica se o usuário é admin
+  if (req.usuario.role !== 'admin') { // Verifica se o usuário é admin
     return res.status(403).send('Acesso negado. Somente administradores.');
   }
   next();
@@ -133,7 +133,7 @@ app.post('/login', (req, res) => {
       // Gera um token JWT com os dados do usuário
       const token = jwt.sign(
         { id: usuario.id, email: usuario.email, role: usuario.role }, // role seria a coluna que indica o tipo de usuário
-        segredoJWT,
+        'segredoJWT',
         { expiresIn: '1h' } // O token expira em 1 hora
       );
 
