@@ -1,11 +1,10 @@
 document.getElementById('loginForm').addEventListener('submit', async function(e) {
-    e.preventDefault(); // Impede o envio tradicional do formulário
+    e.preventDefault();
 
     const email = document.getElementById('emailid').value;
     const senha = document.getElementById('senhaid').value;
 
     try {
-        // Faz a requisição de login
         const response = await fetch('/login', {
             method: 'POST',
             headers: {
@@ -13,16 +12,19 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
             },
             body: JSON.stringify({ email, senha })
         });
-        console.log(response)
-        const data = await response.json();
-        console.log(data)
 
-        if (response.ok && data.token) {
-            // Armazena o token no localStorage
-            localStorage.setItem('token', data.token);
-        
-            // Redireciona para a página de admin
-            window.location.href = 'pgPrincipalLogado.html';
+        let data;
+        try {
+            data = await response.json();
+        } catch (jsonError) {
+            console.error('Erro ao processar JSON:', jsonError);
+            alert('Erro no formato da resposta do servidor.');
+            return;
+        }
+
+        if (response.ok && data.success) {
+            // Redireciona para a página principal ao confirmar sucesso
+            window.location.href = 'pgPrincipal.html';
         } else {
             alert(data.error || 'Erro no login');
         }
@@ -32,5 +34,3 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
         alert('Erro no servidor');
     }
 });
-
-

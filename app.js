@@ -4,8 +4,7 @@ const path = require('path');
 const app = express();
 const { engine } = require('express-handlebars');
 const session = require('express-session');
-const jwt = require('jsonwebtoken');
-const segredoJWT = 'seuSegredoJWT'; // Deve ser uma string secreta segura
+
 
 
 // Body-parser integrado no express para interpretar JSON e dados de formulários
@@ -51,40 +50,14 @@ conexão.connect(err => {
 app.get('/', (req, res) => {
   if (req.session && req.session.usuario) {
     // Se o usuário estiver logado, renderize a página com o nome do usuário
-    res.sendFile(path.join(__dirname, 'pgPrincipalLogado.html'));
+    res.sendFile(path.join(__dirname, 'pgPrincipal.html'));
   } else {
     // Caso contrário, mostre a página com as opções de login e cadastro
     res.sendFile(path.join(__dirname, 'pgPrincipal.html'));
   }
 });
-function verificarToken(req, res, next) {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Extrai o token do cabeçalho
 
-  if (!token) {
-      return res.status(403).json({ error: 'Acesso negado. Token não fornecido.' });
-  }
 
-  jwt.verify(token, segredoJWT, (err, usuario) => {
-      if (err) {
-          return res.status(403).json({ error: 'Token inválido ou expirado.' });
-      }
-
-      req.usuario = usuario; // Armazena as informações do usuário no req para usar nas rotas
-      next(); // Continua para a próxima rota
-  });
-}
-
-const isAdmin = (req, res, next) => {
-  if (req.usuario.role !== 'admin') { // Verifica se o usuário é admin
-    return res.status(403).send('Acesso negado. Somente administradores.');
-  }
-  next();
-};
-
-app.get('/admin', verificarToken, (req, res) => {
-  res.send('Bem-vindo à área de administrador');
-});
 
 
 // Rota para verificar se o usuário está logado
@@ -126,22 +99,27 @@ app.post('/login', (req, res) => {
       console.error('Erro ao fazer login:', erro);
       return res.status(500).json({ error: 'Erro ao fazer login.' });
     }
+    
     if (resultados.length > 0) {
       const usuario = resultados[0];
-
-      // Gera um token JWT com os dados do usuário
-      const token = jwt.sign(
-        { id: usuario.id, email: usuario.email, role: usuario.role }, // role seria a coluna que indica o tipo de usuário
-        'segredoJWT',
-        { expiresIn: '1h' } // O token expira em 1 hora
-      );
-
-      res.json({ token }); // Retorna o token ao frontend
+      
+      // Armazena o usuário na sessão com a função dele (usuario ou administrador)
+      req.session.usuario = { id: usuario.id, nome: usuario.nome, email: usuario.email, role: usuario.role };
+      
+      // Redireciona conforme o papel do usuário
+      if (usuario.role === 'admin') {
+        res.json({ success: true, redirect: '/pgAdmin.html' }); // Página de administrador
+      } else if (usuario.role === 'user') {
+        res.json({ success: true, redirect: '/pgUsuario.html' }); // Página de usuário
+      } else {
+        res.status(403).json({ error: 'Acesso negado.' });
+      }
     } else {
       res.status(401).json({ error: 'Email ou senha incorretos.' });
     }
   });
 });
+
 
 // Rota de logout
 app.get('/logout', (req, res) => {

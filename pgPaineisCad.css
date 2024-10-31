@@ -17,10 +17,6 @@ nav {
     padding: 25px;
     margin: 0;
 }
-.logo {
-    display: flex;
-    flex-direction: column;
-}
 .itens {
     list-style: none;
     display: flex;
@@ -30,46 +26,22 @@ nav {
     color: #F9FF80;
     text-decoration: none;
 }
-.login {
+.btn{
+    padding: 10px 40px;
+    text-align: center;
+}
+.cadMovel {
     padding: 10px 40px;
     font-size: 15px;
     border: none;
     border-radius: 5px;
-    background-color: #F9FF80;
-    color: #3642FE;
+    background-color: #3642FE;
+    color: #F9FF80;
     font-family: "Poppins", sans-serif;
     cursor: pointer;
 }
-.cadastro {
-    padding: 10px 40px;
-    font-size: 15px;
-    border: none;
-    border-radius: 5px;
-    background-color: #F9FF80;
-    color: #3642FE;
-    font-family: "Poppins", sans-serif;
-    cursor: pointer;
-}
-.userBtn {
-    padding: 10px 40px;
-    font-size: 15px;
-    border: none;
-    border-radius: 5px;
-    background-color: #F9FF80;
-    color: #3642FE;
-    font-family: "Poppins", sans-serif;
-    cursor: pointer;
-}
-.login:hover {
-    background-color: #f6d853;
-    transition: 1s ;
-}
-.cadastro:hover {
-    background-color: #f6d853;
-    transition: 1s ;
-}
-.userBtn:hover {
-    background-color: #f6d853;
+.cadMovel:hover {
+    background-color: #1e19a8;
     transition: 1s ;
 }
 .itens>li>a:hover {
@@ -175,4 +147,57 @@ footer {
     nav .btn {
         margin-top: 20px;
     }
+}
+/* Estilos para os modais */
+.cad {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; 
+    background-color: rgba(0, 0, 0, 0.5); 
+    font-family: "Poppins", serif;
+    border-radius: 8px;
+}
+
+.modal-cad {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+#cadMoveis {
+    flex-direction: column;
+    display: flex;
+    border-radius: 8px;
+}
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
 }
