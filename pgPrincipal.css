@@ -60,6 +60,17 @@ nav {
     font-family: "Poppins", sans-serif;
     cursor: pointer;
 }
+.logout {
+    padding: 5px 30px;
+    font-size: 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #3642FE;
+    color: #F9FF80;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    
+}
 .login:hover {
     background-color: #f6d853;
     transition: 1s ;
@@ -70,6 +81,10 @@ nav {
 }
 .userBtn:hover {
     background-color: #f6d853;
+    transition: 1s ;
+}
+.logout {
+    color: #f6d853;
     transition: 1s ;
 }
 .itens>li>a:hover {
