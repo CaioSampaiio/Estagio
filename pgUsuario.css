@@ -54,7 +54,9 @@ nav {
     color: #F9FF80;
     font-size: 22px;
 }
-
+.text {
+    color: #F9FF80;
+}
 .btn {
     background-color: #F9FF80;
     color: #3357ff;

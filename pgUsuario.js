@@ -49,3 +49,13 @@ document.getElementById("feedbackForm").addEventListener("submit", function(even
     feedbackInput.value = ""; // Limpa o campo de feedback
     closeFeedbackModal(); // Fecha o modal após o envio do feedback
 });
+
+fetch('/status')
+            .then(response => response.json())
+            .then(data => {
+                if (data.loggedIn) {
+                    const authLinks = document.getElementById('auth-links');
+                    authLinks.innerHTML = `<span>Olá, <strong>${data.nome}</strong>!</span>`;
+                }
+            })
+            .catch(error => console.error('Erro ao verificar o status do login:', error));
