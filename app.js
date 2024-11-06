@@ -1,11 +1,14 @@
 const express = require('express');
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const path = require('path');
-const app = express();
-const { engine } = require('express-handlebars');
+const multer = require('multer');
 const session = require('express-session');
 
+const app = express();
+const { engine } = require('express-handlebars');
 
+// Configuração do multer para armazenamento temporário de arquivos
+const upload = multer({ dest: 'uploads/' });
 
 // Body-parser integrado no express para interpretar JSON e dados de formulários
 app.use(express.json());
@@ -36,7 +39,6 @@ const conexão = mysql.createConnection({
   database: 'popularmoveis'
 });
 
-
 // Conectar ao banco de dados
 conexão.connect(err => {
   if (err) {
@@ -46,20 +48,36 @@ conexão.connect(err => {
   console.log('Conectado ao banco de dados MySQL.');
 });
 
-// Servir o arquivo HTML quando o usuário acessar a página inicial
-app.get('/', (req, res) => {
-  if (req.session && req.session.usuario) {
-    // Se o usuário estiver logado, renderize a página com o nome do usuário
-    res.sendFile(path.join(__dirname, 'pgPrincipal.html'));
-  } else {
-    // Caso contrário, mostre a página com as opções de login e cadastro
-    res.sendFile(path.join(__dirname, 'pgPrincipal.html'));
-  }
+// Rota para cadastro de móveis
+app.post('/cadastrar-movel', upload.single('imagem'), (req, res) => {
+  const { nome, informacao, preco, promocao, estoque, categoria } = req.body;
+  const promocaoBool = promocao === 'true' ? 1 : 0;
+
+  // Lê a imagem carregada e converte para binário
+  const imagem = fs.readFileSync(req.file.path);
+
+  // Query de inserção no banco de dados
+  const sql = `INSERT INTO produtos (nome, imagem, informacao, preco, promocao, estoque, categoria) 
+               VALUES (?, ?, ?, ?, ?, ?, ?)`;
+
+  conexão.query(
+    sql,
+    [nome, imagem, informacao, parseFloat(preco), promocaoBool, parseInt(estoque), categoria],
+    (error, results) => {
+      // Remove o arquivo de imagem temporário
+      fs.unlinkSync(req.file.path);
+
+      if (error) {
+        console.error('Erro ao inserir no banco de dados:', error);
+        res.status(500).json({ error: 'Erro ao cadastrar o produto.' });
+      } else {
+        res.json({ success: true, message: 'Produto cadastrado com sucesso!' });
+      }
+    }
+  );
 });
 
-
-
-
+// Outras rotas e configurações...
 // Rota para verificar se o usuário está logado
 app.get('/status', (req, res) => {
   if (req.session.usuario) {
@@ -103,14 +121,12 @@ app.post('/login', (req, res) => {
     if (resultados.length > 0) {
       const usuario = resultados[0];
       
-      // Armazena o usuário na sessão com a função dele (usuario ou administrador)
       req.session.usuario = { id: usuario.id, nome: usuario.nome, email: usuario.email, role: usuario.role };
       
-      // Redireciona conforme o papel do usuário
       if (usuario.role === 'admin') {
-        res.json({ success: true, redirect: '/pgAdmin.html' }); // Página de administrador
+        res.json({ success: true, redirect: '/pgAdmin.html' });
       } else if (usuario.role === 'user') {
-        res.json({ success: true, redirect: '/pgUsuario.html' }); // Página de usuário
+        res.json({ success: true, redirect: '/pgUsuario.html' });
       } else {
         res.status(403).json({ error: 'Acesso negado.' });
       }
@@ -120,7 +136,6 @@ app.post('/login', (req, res) => {
   });
 });
 
-
 // Rota de logout
 app.get('/logout', (req, res) => {
   req.session.destroy(() => {
@@ -128,9 +143,7 @@ app.get('/logout', (req, res) => {
   });
 });
 
-
 // Inicializa o servidor
 app.listen(3000, () => {
   console.log('Servidor rodando na porta 3000');
 });
-
