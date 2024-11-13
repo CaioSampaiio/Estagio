@@ -5,6 +5,7 @@ const app = express();
 const { engine } = require('express-handlebars');
 const session = require('express-session');
 const multer = require('multer');
+const fs = require('fs');
 const bodyParser = require('body-parser');
 
 
@@ -167,6 +168,72 @@ app.get('/moveis/:categoria', (req, res) => {
     }
   });
 });
+
+// Rota para adicionar imagem e feedback
+app.post('/feedback', (req, res) => {
+  const { feedback } = req.body;
+
+  if (!feedback) {
+    return res.status(400).json({ error: 'Feedback é obrigatório.' });
+  }
+
+  const sql = `INSERT INTO feedback (feedback) VALUES (?)`;
+
+  conexão.query(sql, [feedback], (error, results) => {
+    if (error) {
+      console.error('Erro ao inserir no banco de dados:', error);
+      return res.status(500).json({ error: 'Erro ao salvar o feedback.' });
+    } else {
+      res.json({ success: true, message: 'Feedback salvo com sucesso!' });
+    }
+  });
+});
+
+// Rota para upload e salvamento da imagem de perfil
+app.post('/upload-perfil', upload.single('imagem'), (req, res) => {
+  if (!req.session.usuario || !req.session.usuario.id) {
+    return res.status(401).json({ error: 'Usuário não está logado.' });
+  }
+
+  const userId = req.session.usuario.id;
+  const imagem = fs.readFileSync(req.file.path);
+
+  // Salva a imagem no banco de dados
+  const sql = 'UPDATE usuario SET imagem_perfil = ? WHERE id = ?';
+  conexão.query(sql, [imagem, userId], (error, results) => {
+    fs.unlinkSync(req.file.path); // Remove o arquivo temporário
+
+    if (error) {
+      console.error('Erro ao salvar imagem de perfil:', error);
+      return res.status(500).json({ error: 'Erro ao salvar imagem de perfil.' });
+    }
+    res.json({ success: true, message: 'Imagem de perfil salva com sucesso!' });
+  });
+});
+
+// Rota para obter a imagem de perfil
+app.get('/imagem-perfil', (req, res) => {
+  if (!req.session.usuario || !req.session.usuario.id) {
+    return res.status(401).json({ error: 'Usuário não está logado.' });
+  }
+
+  const userId = req.session.usuario.id;
+  const sql = 'SELECT imagem_perfil FROM usuario WHERE id = ?';
+  conexão.query(sql, [userId], (error, results) => {
+    if (error) {
+      console.error('Erro ao obter imagem de perfil:', error);
+      return res.status(500).json({ error: 'Erro ao obter imagem de perfil.' });
+    }
+
+    if (results.length > 0 && results[0].imagem_perfil) {
+      res.setHeader('Content-Type', 'image/jpeg');
+      res.send(results[0].imagem_perfil);
+    } else {
+      res.status(404).json({ error: 'Imagem de perfil não encontrada.' });
+    }
+  });
+});
+
 
 
 

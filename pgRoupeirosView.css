@@ -17,10 +17,6 @@ nav {
     padding: 25px;
     margin: 0;
 }
-.logo {
-    display: flex;
-    flex-direction: column;
-}
 .itens {
     list-style: none;
     display: flex;
@@ -30,38 +26,12 @@ nav {
     color: #F9FF80;
     text-decoration: none;
 }
-.login {
+.btn{
     padding: 10px 40px;
-    font-size: 15px;
-    border: none;
-    border-radius: 5px;
-    background-color: #F9FF80;
-    color: #3642FE;
-    font-family: "Poppins", sans-serif;
-    cursor: pointer;
+    text-align: center;
 }
-.cadastro {
+.cadMovel {
     padding: 10px 40px;
-    font-size: 15px;
-    border: none;
-    border-radius: 5px;
-    background-color: #F9FF80;
-    color: #3642FE;
-    font-family: "Poppins", sans-serif;
-    cursor: pointer;
-}
-.userBtn {
-    padding: 10px 40px;
-    font-size: 15px;
-    border: none;
-    border-radius: 5px;
-    background-color: #F9FF80;
-    color: #3642FE;
-    font-family: "Poppins", sans-serif;
-    cursor: pointer;
-}
-.logout {
-    padding: 5px 30px;
     font-size: 15px;
     border: none;
     border-radius: 5px;
@@ -69,22 +39,9 @@ nav {
     color: #F9FF80;
     font-family: "Poppins", sans-serif;
     cursor: pointer;
-    
 }
-.login:hover {
-    background-color: #f6d853;
-    transition: 1s ;
-}
-.cadastro:hover {
-    background-color: #f6d853;
-    transition: 1s ;
-}
-.userBtn:hover {
-    background-color: #f6d853;
-    transition: 1s ;
-}
-.logout {
-    color: #f6d853;
+.cadMovel:hover {
+    background-color: #1e19a8;
     transition: 1s ;
 }
 .itens>li>a:hover {
@@ -191,6 +148,52 @@ footer {
         margin-top: 20px;
     }
 }
+/* Estilos para os modais */
+.cad {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; 
+    background-color: rgba(0, 0, 0, 0.5); 
+    font-family: "Poppins", serif;
+    border-radius: 8px;
+}
+
+.modal-cad {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 400px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+#cadMoveis {
+    flex-direction: column;
+    display: flex;
+    border-radius: 8px;
+}
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
 textarea {
     width: 100%;
     padding: 10px;
@@ -198,70 +201,39 @@ textarea {
     border-radius: 5px;
     border: 1px solid #ccc;
 }
-/* Container principal para alinhar a imagem e as informações do produto lado a lado */
+
 .moveis-container {
     display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
     justify-content: center;
-    align-items: flex-start;
-    padding: 20px;
-    background-color: white;
-    max-width: 1000px;
-    margin: 0 auto;
-    border-radius: 10px;
-    font-family: "Poppins", serif;
 }
 
-/* Estilo da imagem do móvel */
+.movel {
+    border: 1px solid #ddd;
+    padding: 20px;
+    width: 300px;
+    text-align: center;
+}
+
 .movel img {
-    max-width: 400px;
+    max-width: 100%;
     height: auto;
-    border-radius: 10px;
-    margin-right: 20px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 15px;
 }
 
-/* Estilo para o container das informações */
 .info-produto {
-    background-color: #3642FE;
-    color: #ffffff;
-    padding: 20px;
-    border-radius: 10px;
-    width: 400px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
 }
 
-.info-produto h3 {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.info-produto p {
-    font-size: 14px;
-    margin: 8px 0;
-    line-height: 1.6;
-}
-
-.info-produto p strong {
-    color: #f6d853;
-}
-
-/* Botão de Negociar */
 .btn-negociar {
-    display: block;
+    margin-top: 10px;
+    padding: 10px;
     background-color: #f6d853;
-    color: #3642FE;
     border: none;
-    padding: 12px 20px;
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
-    font-size: 16px;
-    text-align: center;
-    margin-top: 15px;
 }
-
-.btn-negociar:hover {
-    background-color: #f6d853;
-}
-

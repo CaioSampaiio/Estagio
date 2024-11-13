@@ -57,6 +57,24 @@ window.addEventListener('load', function() {
         document.getElementById("logoutBtn").style.display = "none";
     }
 });
+document.querySelectorAll('.itens li a').forEach(link => {
+    link.addEventListener('click', function(event) {
+        event.preventDefault();
+        const categoria = this.textContent; // Pega o nome da categoria no link
+        carregarMoveis(categoria);
+    });
+});
+
+function carregarMoveis(categoria) {
+    fetch(`/moveis/${categoria}`)
+        .then(response => response.json())
+        .then(moveis => {
+            exibirMoveis(moveis, categoria);
+        })
+        .catch(error => {
+            console.error('Erro ao carregar móveis:', error);
+        });
+}
 
 function exibirMoveis(moveis, categoria) {
     const container = document.getElementById('moveisContainer');
@@ -68,15 +86,18 @@ function exibirMoveis(moveis, categoria) {
 
         // Renderiza o conteúdo de cada móvel
         movelDiv.innerHTML = `
-            <img src="uploads/${movel.imagem}.jpg" alt="${movel.nome}">
-            <div class="info-produto">
-                <h3>${movel.nome}</h3>
-                <p><strong>Características:</strong> ${movel.descricao}</p>
-                <p><strong>Preço:</strong> R$${movel.preco.toFixed(2)}</p>
-                <p><strong>Estoque:</strong> ${movel.estoque}</p>
-                <button class="btn-negociar">Negociar</button>
-            </div>
+        <img src="uploads/${movel.imagem}.jpg" alt="${movel.nome}">
+        <div class="info-produto">
+            <h3>${movel.nome}</h3>
+            <p><strong>Características:</strong> ${movel.descricao}</p>
+            <p><strong>Preço:</strong> R$${movel.preco.toFixed(2)}</p>
+            <p><strong>Estoque:</strong> ${movel.estoque}</p>
+            <a href="https://wa.me/5517991417318?text=${encodeURIComponent('Olá, tenho interesse em negociar o móvel ' + movel.nome)}" target="_blank" class="btn-negociar">Negociar</a>
+        </div>
         `;
         container.appendChild(movelDiv);
+
     });
 }
+
+

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>G.Roupas</title>
-    <link rel="stylesheet" href="pgRoupeirosCad.css">
+    <title>Balcões</title>
+    <link rel="stylesheet" href="pgBalcoesView.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
@@ -21,9 +21,9 @@
         </div>
         <div class="links">
             <ul class="itens">
-                <li><a href="#">G.Roupas</a></li>
+                <li><a href="/pgRoupeirosCad.html">G.Roupas</a></li>
                 <li><a href="/pgPaineisCad.html">Paineis</a></li>
-                <li><a href="/pgBalcoesCad.html">Balcões</a></li>
+                <li><a href="#">Balcões</a></li>
                 <li><a href="/pgArmariosCad.html">Armários</a></li>
             </ul>
         </div>
@@ -40,7 +40,7 @@
             <span class="close" onclick="closePhotoModal()">&times;</span>
             <h2>Cadastrar Móveis</h2>
             <form id="cadMoveis">
-                <label for="">Adicione uma imagem</label>
+                <label for="">Adicine uma imagem</label>
                 <input type="file" id="photoInput" accept="image/*">
                 <label for="">Nome do móvel</label>
                 <input type="text" id="nomeCad">
@@ -49,21 +49,11 @@
                 <label for="">Promoção</label>
                 <input type="number" id="promoCad">
                 <label for="">Preço</label>
-                <input type="number" id="preçoCad">
-                <label for="">Estoque</label>
-                <input type="number" id="QuatidadeCad"><br>
-                <select id="categoriaCad" name="categoria" required>
-                    <option value="G.Roupas">G.Roupas</option>
-                    <option value="Paineis">Paineis</option>
-                    <option value="Balcões">Balcões</option>
-                    <option value="Armários">Armários</option>
-                </select><br>
+                <input type="number" id="preçoCad"><br> 
                 <button type="submit" class="btn">Salvar Cadastro</button>
             </form>
         </div>
     </div>
-
-    <div id="moveisContainer" class="moveis-container"></div>
-    <script src="/pgRoupeirosCad.js"></script>
+    <script src="/pgBalcoesView.js"></script>
 </body>
 </html>
