@@ -57,3 +57,26 @@ window.addEventListener('load', function() {
         document.getElementById("logoutBtn").style.display = "none";
     }
 });
+
+function exibirMoveis(moveis, categoria) {
+    const container = document.getElementById('moveisContainer');
+    container.innerHTML = ''; // Limpa o conteúdo anterior
+
+    moveis.forEach(movel => {
+        const movelDiv = document.createElement('div');
+        movelDiv.classList.add('movel');
+
+        // Renderiza o conteúdo de cada móvel
+        movelDiv.innerHTML = `
+            <img src="uploads/${movel.imagem}.jpg" alt="${movel.nome}">
+            <div class="info-produto">
+                <h3>${movel.nome}</h3>
+                <p><strong>Características:</strong> ${movel.descricao}</p>
+                <p><strong>Preço:</strong> R$${movel.preco.toFixed(2)}</p>
+                <p><strong>Estoque:</strong> ${movel.estoque}</p>
+                <button class="btn-negociar">Negociar</button>
+            </div>
+        `;
+        container.appendChild(movelDiv);
+    });
+}

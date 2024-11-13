@@ -201,3 +201,39 @@ textarea {
     border-radius: 5px;
     border: 1px solid #ccc;
 }
+
+.moveis-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.movel {
+    border: 1px solid #ddd;
+    padding: 20px;
+    width: 300px;
+    text-align: center;
+}
+
+.movel img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 15px;
+}
+
+.info-produto {
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.btn-negociar {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f6d853;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}

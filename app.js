@@ -137,7 +137,8 @@ const upload = multer({ storage: storage });
 /// Endpoint para cadastrar móveis
 app.post("/cadastrar-movel", upload.single("imagem"), (req, res) => {
   const { nome, informacao, promocao, preco, estoque, categoria } = req.body;
-  const imagem = req.file ? req.file.filename : null;
+  const imagem = fs.readFileSync(req.file.path); // Lê o conteúdo da imagem como binário
+
 
   const sql = "INSERT INTO produto (nome, descricao, promocao, preco, estoque, categoria, imagem) VALUES (?, ?, ?, ?, ?, ?, ?)";
   const values = [nome, informacao, promocao, preco, estoque, categoria, imagem];
@@ -151,6 +152,23 @@ app.post("/cadastrar-movel", upload.single("imagem"), (req, res) => {
       }
   });
 });
+
+app.get('/moveis/:categoria', (req, res) => {
+  const categoria = req.params.categoria;
+
+  const sql = 'SELECT * FROM produto WHERE categoria = ?';
+  conexão.query(sql, [categoria], (error, results) => {
+    if (error) {
+      console.error('Erro ao buscar móveis:', error);
+      res.status(500).json({ error: 'Erro ao buscar móveis.' });
+    } else {
+      
+      res.json(results);
+    }
+  });
+});
+
+
 
 
 // Rota de logout
