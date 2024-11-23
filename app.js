@@ -7,6 +7,9 @@ const session = require('express-session');
 const multer = require('multer');
 const fs = require('fs');
 const bodyParser = require('body-parser');
+const { verificarAutenticacao, verificarAdmin } = require('./middlewares');
+const PDFDocument = require('pdfkit');
+
 
 
 
@@ -20,8 +23,13 @@ app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'pgLogin.html')); 
 });
 
-app.get('/usuario', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pgUsuario.html')); 
+app.get('/usuario', verificarAutenticacao, (req, res) => {
+  res.sendFile(path.join(__dirname, 'pgUsuario.html'));
+});
+
+
+app.get('/admin', verificarAdmin, (req, res) => {
+  res.sendFile(path.join(__dirname, 'pgAdmin.html'));
 });
 
 app.use(session({
@@ -92,36 +100,36 @@ app.post('/cadastrar', function(req, res) {
   });
 });
 
-// Rota de login
+
 app.post('/login', (req, res) => {
   const { email, senha } = req.body;
 
-  const sql = 'SELECT * FROM usuario WHERE email = ? AND senha = ?';
-  conexão.query(sql, [email, senha], (erro, resultados) => {
-    if (erro) {
-      console.error('Erro ao fazer login:', erro);
-      return res.status(500).json({ error: 'Erro ao fazer login.' });
-    }
-    
-    if (resultados.length > 0) {
-      const usuario = resultados[0];
-      
-      // Armazena o usuário na sessão com a função dele (usuario ou administrador)
-      req.session.usuario = { id: usuario.id, nome: usuario.nome, email: usuario.email, role: usuario.role };
-      
-      // Redireciona conforme o papel do usuário
-      if (usuario.role === 'admin') {
-        res.json({ success: true, redirect: '/pgAdmin.html' }); // Página de administrador
-      } else if (usuario.role === 'user') {
-        res.json({ success: true, redirect: '/pgUsuario.html' }); // Página de usuário
-      } else {
-        res.status(403).json({ error: 'Acesso negado.' });
+  if (!email || !senha) {
+      return res.status(400).json({ message: "Email e senha são obrigatórios." });
+  }
+
+  const sql = 'SELECT idUsuario, nome, permissao FROM usuario WHERE email = ? AND senha = ?';
+
+  conexão.query(sql, [email, senha], (err, rows) => {
+      if (err) {
+          console.error('Erro no servidor:', err);
+          return res.status(500).json({ message: "Erro no servidor." });
       }
-    } else {
-      res.status(401).json({ error: 'Email ou senha incorretos.' });
-    }
+
+      if (rows.length > 0) {
+          const user = rows[0];
+          req.session.usuario = user; // Salva na sessão
+          res.status(200).json({
+              message: "Login bem-sucedido",
+              user: { id: user.id, nome: user.nome, permissao: user.permissao },
+          });
+      } else {
+          res.status(401).json({ message: "Credenciais inválidas." });
+      }
   });
 });
+
+
 // Configuração do multer para salvar a imagem
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -234,8 +242,107 @@ app.get('/imagem-perfil', (req, res) => {
   });
 });
 
+app.get('/download-relatorio-usuarios', (req, res) => {
+  const doc = new PDFDocument();
+
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', 'attachment; filename=relatorio-usuarios.pdf');
+
+  const sql = 'SELECT idUsuario, nome, email, permissao FROM usuario';
+
+  conexão.query(sql, (err, results) => {
+      if (err) {
+          console.error('Erro ao gerar relatório de usuários:', err);
+          return res.status(500).send('Erro ao gerar relatório.');
+      }
+
+      doc.text('Relatório de Usuários', { align: 'center' });
+      doc.moveDown();
+
+      results.forEach(user => {
+          doc.text(`ID: ${user.idUsuario}`);
+          doc.text(`Nome: ${user.nome}`);
+          doc.text(`Email: ${user.email}`);
+          doc.text(`Permissão: ${user.permissao}`);
+          doc.moveDown();
+      });
+
+      doc.pipe(res);
+      doc.end();
+  });
+});
+
+app.get('/download-relatorio-produtos-categoria', (req, res) => {
+  const PDFDocument = require('pdfkit');
+  const doc = new PDFDocument();
+
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', 'attachment; filename=relatorio-produtos-categoria.pdf');
+
+  const sql = `
+      SELECT p.nome AS produto, c.nome AS categoria, p.preco
+      FROM produto p
+      JOIN categoria c ON p.categoria = c.nome;
+  `;
+
+  conexão.query(sql, (err, results) => {
+      if (err) {
+          console.error('Erro ao gerar relatório de produtos por categoria:', err);
+          return res.status(500).send('Erro ao gerar relatório.');
+      }
+
+      doc.text('Relatório de Produtos por Categoria', { align: 'center' });
+      doc.moveDown();
+
+      if (results.length === 0) {
+          doc.text('Nenhum dado encontrado.');
+      } else {
+          results.forEach(row => {
+              doc.text(`Produto: ${row.produto}`);
+              doc.text(`Categoria: ${row.categoria}`);
+              doc.text(`Preço: R$${row.preco.toFixed(2)}`);
+              doc.moveDown();
+          });
+      }
+
+      doc.pipe(res);
+      doc.end();
+  });
+});
 
 
+
+app.get('/download-relatorio-estoque', (req, res) => {
+  const doc = new PDFDocument();
+
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', 'attachment; filename=relatorio-estoque.pdf');
+
+  const sql = `
+      SELECT p.nome AS produto, e.quantidade
+      FROM estoque e
+      JOIN produto p ON e.produto_id = p.id;
+  `;
+
+  conexão.query(sql, (err, results) => {
+      if (err) {
+          console.error('Erro ao gerar relatório de estoque:', err);
+          return res.status(500).send('Erro ao gerar relatório.');
+      }
+
+      doc.text('Relatório de Estoque', { align: 'center' });
+      doc.moveDown();
+
+      results.forEach(row => {
+          doc.text(`Produto: ${row.produto}`);
+          doc.text(`Quantidade: ${row.quantidade}`);
+          doc.moveDown();
+      });
+
+      doc.pipe(res);
+      doc.end();
+  });
+});
 
 
 // Rota de logout

@@ -1,3 +1,19 @@
+// Baixar Relatório de Usuários (PDF)
+document.getElementById('downloadUsuariosPdf').addEventListener('click', () => {
+    window.open('/download-relatorio-usuarios', '_blank');
+});
+
+// Baixar Relatório de Produtos por Categoria (PDF)
+document.getElementById('downloadProdutosCategoriaPdf').addEventListener('click', () => {
+    window.open('/download-relatorio-produtos-categoria', '_blank');
+});
+
+// Baixar Relatório de Estoque (PDF)
+document.getElementById('downloadEstoquePdf').addEventListener('click', () => {
+    window.open('/download-relatorio-estoque', '_blank');
+});
+
+
 // Mostrar o modal de cadastro
 function showAdicionarModal() {
     document.getElementById("cadModal").style.display = "block";
@@ -57,6 +73,9 @@ document.getElementById("cadMoveis").addEventListener("submit", async function(e
     }
 });
 
+
+
+
 // Verificar status de login
 fetch('/status')
     .then(response => response.json())
@@ -69,8 +88,17 @@ fetch('/status')
     })
     .catch(error => console.error('Erro ao verificar o status do login:', error));
 
+    document.addEventListener('DOMContentLoaded', () => {
+        const user = JSON.parse(localStorage.getItem('user'));
     
+        if (!user || user.permissao !== 1) {
+            alert('Acesso negado! Você será redirecionado.');
+            window.location.href = 'login.html';
+        }
     
+    });
+    
+
     
     
     

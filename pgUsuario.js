@@ -1,3 +1,18 @@
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('/status') // Verifica o status de login no backend
+        .then(response => response.json())
+        .then(data => {
+            if (!data.loggedIn) {
+                alert('Você precisa estar logado para acessar esta página.');
+                window.location.href = 'login.html';
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao verificar status do login:', error);
+            window.location.href = 'login.html';
+        });
+});
+
 // Função para abrir o modal de foto
 function showPhotoModal() {
     document.getElementById('photoModal').style.display = 'block';
@@ -101,3 +116,13 @@ fetch('/status')
                 }
             })
             .catch(error => console.error('Erro ao verificar o status do login:', error));
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (!user || user.permissao !== 0) {
+        alert('Acesso negado! Você será redirecionado.');
+        window.location.href = 'login.html';
+    }
+});

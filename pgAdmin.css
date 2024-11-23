@@ -30,6 +30,11 @@ nav {
     padding: 10px 40px;
     text-align: center;
 }
+.btnRelatorios{
+    padding: 10px 40px;
+    text-align: center;
+    display:flexbox;
+}
 .cadMovel {
     padding: 10px 40px;
     font-size: 15px;
