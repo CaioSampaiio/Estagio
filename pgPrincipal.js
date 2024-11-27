@@ -86,7 +86,7 @@ function exibirMoveis(moveis, categoria) {
 
         // Renderiza o conteúdo de cada móvel
         movelDiv.innerHTML = `
-        <img src="uploads/${movel.imagem}.jpg" alt="${movel.nome}">
+        <img src="uploads/${movel.imagem}" alt="${movel.nome}">
         <div class="info-produto">
             <h3>${movel.nome}</h3>
             <p><strong>Características:</strong> ${movel.descricao}</p>

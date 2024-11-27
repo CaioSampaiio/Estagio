@@ -36,49 +36,52 @@ function closeFeedbackModal() {
 // Enviar a imagem de perfil via AJAX
 document.getElementById('photoForm').addEventListener('submit', function(event) {
     event.preventDefault();
+
     const formData = new FormData(this);
 
     fetch('/upload-perfil', {
         method: 'POST',
-        body: formData
+        body: formData,
+        credentials: 'include' // Inclui cookies para autenticação de sessão
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Imagem de perfil salva com sucesso!');
-            loadProfileImage(); // Carrega a imagem de perfil
-            closePhotoModal(); // Fecha o modal após salvar
-        } else {
-            alert('Erro ao salvar imagem de perfil: ' + data.error);
-        }
-    })
-    .catch(error => {
-        console.error('Erro:', error);
-        alert('Erro ao salvar imagem de perfil.');
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                loadProfileImage(); // Atualiza a imagem de perfil
+            } else {
+                alert('Erro: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao enviar a imagem:', error);
+            alert('Erro ao salvar a imagem.');
+        });
 });
 
 // Função para carregar a imagem de perfil
 function loadProfileImage() {
-    fetch('/imagem-perfil')
+    fetch('/imagem-perfil', {
+        method: 'GET',
+        credentials: 'include' // Inclui cookies para autenticação de sessão
+    })
         .then(response => {
-            if (response.ok) {
-                return response.blob();
-            } else {
-                throw new Error('Imagem de perfil não encontrada.');
-            }
+            if (!response.ok) throw new Error('Erro ao carregar imagem.');
+            return response.blob(); // Retorna o blob da imagem
         })
         .then(blob => {
             const url = URL.createObjectURL(blob);
-            document.getElementById('userPhoto').src = url; // Exibe a imagem no elemento de perfil
+            document.getElementById('userPhoto').src = url; // Atualiza a imagem exibida
         })
         .catch(error => {
             console.error('Erro ao carregar imagem de perfil:', error);
         });
 }
 
+
 // Carrega a imagem de perfil ao abrir a página
-document.addEventListener("DOMContentLoaded", loadProfileImage);
+document.addEventListener('DOMContentLoaded', loadProfileImage);
+
 // Enviar Feedback via AJAX
 document.getElementById('feedbackForm').addEventListener('submit', function(event) {
     event.preventDefault();
@@ -123,6 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!user || user.permissao !== 0) {
         alert('Acesso negado! Você será redirecionado.');
-        window.location.href = 'login.html';
+        window.location.href = 'pgLogin.html';
     }
 });

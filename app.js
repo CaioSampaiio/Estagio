@@ -12,7 +12,12 @@ const PDFDocument = require('pdfkit');
 
 
 
-
+app.use(session({
+  secret: 'caio',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // Caso eu use HTTPS, usar true  
+}));
 // Body-parser integrado no express para interpretar JSON e dados de formulários
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -32,12 +37,7 @@ app.get('/admin', verificarAdmin, (req, res) => {
   res.sendFile(path.join(__dirname, 'pgAdmin.html'));
 });
 
-app.use(session({
-  secret: 'caio',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false } // Caso eu use HTTPS, usar true  
-}));
+
 
 // Configuração do banco de dados
 const conexão = mysql.createConnection({
@@ -67,6 +67,7 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'pgPrincipal.html'));
   }
 });
+
 
 
 
@@ -136,7 +137,7 @@ const storage = multer.diskStorage({
       cb(null, "uploads/"); // Pasta onde as imagens serão salvas
   },
   filename: (req, file, cb) => {
-      cb(null, Date.now() + path.extname(file.originalname));
+      cb(null, file.originalname);
   }
 });
 
@@ -146,7 +147,7 @@ const upload = multer({ storage: storage });
 /// Endpoint para cadastrar móveis
 app.post("/cadastrar-movel", upload.single("imagem"), (req, res) => {
   const { nome, informacao, promocao, preco, estoque, categoria } = req.body;
-  const imagem = fs.readFileSync(req.file.path); // Lê o conteúdo da imagem como binário
+  const imagem = req.file.filename; // Lê o conteúdo da imagem como binário
 
 
   const sql = "INSERT INTO produto (nome, descricao, promocao, preco, estoque, categoria, imagem) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -158,6 +159,7 @@ app.post("/cadastrar-movel", upload.single("imagem"), (req, res) => {
           res.status(500).json({ error: "Erro ao cadastrar o móvel." });
       } else {
           res.status(200).json({ message: "Móvel cadastrado com sucesso!" });
+          registrarLog('produto', req.session.usuario.nome, 'INSERT');
       }
   });
 });
@@ -198,49 +200,71 @@ app.post('/feedback', (req, res) => {
 });
 
 // Rota para upload e salvamento da imagem de perfil
+// Rota para upload e salvamento da imagem de perfil
 app.post('/upload-perfil', upload.single('imagem'), (req, res) => {
-  if (!req.session.usuario || !req.session.usuario.id) {
-    return res.status(401).json({ error: 'Usuário não está logado.' });
+  if (!req.file) {
+      console.error('Nenhuma imagem foi enviada.');
+      return res.status(400).json({ error: 'Nenhuma imagem foi enviada.' });
   }
 
-  const userId = req.session.usuario.id;
+  const userId = req.session.usuario?.idUsuario; // Obtém o ID do usuário da sessão
+
+  if (!userId) {
+      console.error('ID do usuário não encontrado na sessão.');
+      return res.status(401).json({ error: 'Usuário não autenticado.' });
+  }
+
   const imagem = fs.readFileSync(req.file.path);
 
-  // Salva a imagem no banco de dados
-  const sql = 'UPDATE usuario SET imagem_perfil = ? WHERE id = ?';
+  const sql = 'INSERT INTO userimg (imagemperfil, idUsuario) VALUES (?, ?)';
   conexão.query(sql, [imagem, userId], (error, results) => {
-    fs.unlinkSync(req.file.path); // Remove o arquivo temporário
+      // Remove o arquivo temporário após salvar no banco
+      fs.unlinkSync(req.file.path);
 
-    if (error) {
-      console.error('Erro ao salvar imagem de perfil:', error);
-      return res.status(500).json({ error: 'Erro ao salvar imagem de perfil.' });
-    }
-    res.json({ success: true, message: 'Imagem de perfil salva com sucesso!' });
+      if (error) {
+          console.error('Erro ao salvar a imagem de perfil no banco:', error);
+          return res.status(500).json({ error: 'Erro ao salvar a imagem no banco.' });
+      }
+
+      res.json({ success: true, message: 'Imagem salva com sucesso!' });
   });
 });
+
+
+
+
 
 // Rota para obter a imagem de perfil
+// Rota para obter a imagem de perfil
 app.get('/imagem-perfil', (req, res) => {
-  if (!req.session.usuario || !req.session.usuario.id) {
-    return res.status(401).json({ error: 'Usuário não está logado.' });
+  const userId = req.session.usuario?.idUsuario;
+
+  if (!userId) {
+      console.error('ID do usuário não encontrado na sessão.');
+      return res.status(401).json({ error: 'Usuário não autenticado.' });
   }
 
-  const userId = req.session.usuario.id;
-  const sql = 'SELECT imagem_perfil FROM usuario WHERE id = ?';
-  conexão.query(sql, [userId], (error, results) => {
-    if (error) {
-      console.error('Erro ao obter imagem de perfil:', error);
-      return res.status(500).json({ error: 'Erro ao obter imagem de perfil.' });
-    }
+  const sql = 'SELECT imagemperfil FROM userimg WHERE idUsuario = ? ORDER BY id DESC LIMIT 1';
 
-    if (results.length > 0 && results[0].imagem_perfil) {
-      res.setHeader('Content-Type', 'image/jpeg');
-      res.send(results[0].imagem_perfil);
-    } else {
-      res.status(404).json({ error: 'Imagem de perfil não encontrada.' });
-    }
+  conexão.query(sql, [userId], (error, results) => {
+      if (error) {
+          console.error('Erro ao buscar a imagem de perfil:', error);
+          return res.status(500).json({ error: 'Erro no servidor.' });
+      }
+
+      if (results.length > 0 && results[0].imagemperfil) {
+          res.setHeader('Content-Type', 'image/jpeg');
+          res.send(results[0].imagemperfil); // Envia a imagem ao cliente
+      } else {
+          console.warn('Nenhuma imagem encontrada para o usuário:', userId);
+          res.status(404).json({ error: 'Imagem não encontrada.' });
+      }
   });
 });
+
+
+
+
 
 app.get('/download-relatorio-usuarios', (req, res) => {
   const doc = new PDFDocument();
@@ -343,6 +367,17 @@ app.get('/download-relatorio-estoque', (req, res) => {
       doc.end();
   });
 });
+
+const registrarLog = (entidade, user, operacao) => {
+  const sql = "INSERT INTO Logs (entidade, user, operacao) VALUES (?, ?, ?)";
+  conexão.query(sql, [entidade, user, operacao], (err) => {
+      if (err) {
+          console.error("Erro ao registrar log:", err);
+      } else {
+          console.log("Log registrado com sucesso.");
+      }
+  });
+};
 
 
 // Rota de logout
